@@ -1,6 +1,7 @@
 package com.example.instagrambe.domain.auth.api.controller;
 
 import com.example.instagrambe.common.support.response.ApiResponse;
+import com.example.instagrambe.domain.auth.api.controller.dto.request.AuthCodeRequestDto;
 import com.example.instagrambe.domain.auth.api.controller.dto.request.JoinRequestDto;
 import com.example.instagrambe.domain.auth.api.controller.dto.response.MemberResponseDto;
 import com.example.instagrambe.domain.auth.api.service.AuthService;
@@ -31,6 +32,12 @@ public class AuthController {
     MemberResponseServiceDto responseServiceDto = authService.join(joinRequestDto.toServiceDto());
     return new ResponseEntity<>(ApiResponse.success(MemberResponseDto.from(responseServiceDto)),
         HttpStatus.OK);
+  }
+
+  @PostMapping("/code")
+  public ResponseEntity<ApiResponse<Object>> sendCode(@RequestBody @Valid AuthCodeRequestDto authCodeRequestDto) {
+    authService.sendCode(authCodeRequestDto.getEmail());
+    return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
   }
 
   @PostMapping("/logout")
