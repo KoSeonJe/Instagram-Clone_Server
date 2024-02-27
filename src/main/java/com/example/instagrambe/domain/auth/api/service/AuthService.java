@@ -22,6 +22,7 @@ public class AuthService {
   private final MemberService memberService;
   private final JwtService jwtService;
   private final PasswordEncoder passwordEncoder;
+  private final MailService mailService;
 
   public MemberResponseServiceDto join(JoinRequestServiceDto requestServiceDto) {
     memberService.validateDuplicatedEmail(requestServiceDto.getEmail());
@@ -30,6 +31,10 @@ public class AuthService {
     memberService.save(member);
     log.info("회원가입 완료");
     return MemberResponseServiceDto.from(member);
+  }
+
+  public void sendCode(String email) {
+    mailService.sendCodeToEmail(email);
   }
 
   public void logout(String accessHeader, Date now) {
