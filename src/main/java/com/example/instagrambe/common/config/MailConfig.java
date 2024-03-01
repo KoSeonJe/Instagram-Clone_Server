@@ -10,35 +10,37 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @Configuration
 public class MailConfig {
 
-  @Value("${spring.mail.host}")
+  @Value("${mail.host}")
   private String host;
 
-  @Value("${spring.mail.port}")
+  @Value("${mail.port}")
   private int port;
 
-  @Value("${spring.mail.username}")
+  @Value("${mail.username}")
   private String username;
 
-  @Value("${spring.mail.password}")
+  @Value("${mail.password}")
   private String password;
 
-  @Value("${spring.mail.properties.mail.smtp.auth}")
+  @Value("${mail.properties.mail.smtp.auth}")
   private boolean auth;
 
-  @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+  @Value("${mail.properties.mail.smtp.starttls.enable}")
   private boolean starttlsEnable;
 
-  @Value("${spring.mail.properties.mail.smtp.starttls.required}")
+  @Value("${mail.properties.mail.smtp.starttls.required}")
   private boolean starttlsRequired;
 
-  @Value("${spring.mail.properties.mail.smtp.connection-timeout}")
+  @Value("${mail.properties.mail.smtp.connection-timeout}")
   private int connectionTimeout;
 
-  @Value("${spring.mail.properties.mail.smtp.timeout}")
+  @Value("${mail.properties.mail.smtp.timeout}")
   private int timeout;
 
-  @Value("${spring.mail.properties.mail.smtp.write timeout}")
+  @Value("${mail.properties.mail.smtp.write timeout}")
   private int writeTimeout;
+
+  private static final String CONTENT_TYPE = "UTF-8";
 
   @Bean
   public JavaMailSender javaMailSender() {
@@ -47,7 +49,7 @@ public class MailConfig {
     mailSender.setPort(port);
     mailSender.setUsername(username);
     mailSender.setPassword(password);
-    mailSender.setDefaultEncoding("UTF-8");
+    mailSender.setDefaultEncoding(CONTENT_TYPE);
     mailSender.setJavaMailProperties(getMailProperties());
 
     return mailSender;
