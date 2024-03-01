@@ -54,6 +54,12 @@ public class GlobalExceptionHandler {
     return ApiResponse.of(ErrorType.DUPLICATE_EMAIL, exception.getMessage());
   }
 
+  @ExceptionHandler(Exception.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ApiResponse<String> exception(Exception exception) {
+    return ApiResponse.of(ErrorType.DEFAULT_ERROR, exception.getMessage());
+  }
+
   private String createExceptionMessage(MethodArgumentNotValidException exception) {
     BindingResult bindingResult = exception.getBindingResult();
     StringBuilder exceptionMessageBuilder = new StringBuilder();
