@@ -17,7 +17,7 @@ public class RefreshTokenRepository implements TokenRepository{
   @Override
   public void save(String key, String value, Long expiration) {
     ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-    valueOperations.set(key, value, expiration, TimeUnit.SECONDS);
+    valueOperations.set(key, value, expiration, TimeUnit.MILLISECONDS);
   }
 
   @Override
