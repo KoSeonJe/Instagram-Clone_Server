@@ -17,7 +17,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Member member = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 이메일입니다."));
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 이메일입니다."));
 
     return User.builder()
         .username(member.getEmail())
