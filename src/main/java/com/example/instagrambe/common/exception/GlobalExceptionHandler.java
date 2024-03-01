@@ -1,5 +1,6 @@
 package com.example.instagrambe.common.exception;
 
+import com.example.instagrambe.common.exception.custom.CustomMessagingException;
 import com.example.instagrambe.common.exception.custom.DuplicatedException;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import com.example.instagrambe.common.support.error.ErrorType;
@@ -60,6 +61,10 @@ public class GlobalExceptionHandler {
     return ApiResponse.of(ErrorType.DEFAULT_ERROR, exception.getMessage());
   }
 
+  @ExceptionHandler(CustomMessagingException.class)
+  public ApiResponse<String> customMessagingException(Exception exception) {
+    return ApiResponse.of(ErrorType.DEFAULT_ERROR, exception.getMessage());
+  }
   private String createExceptionMessage(MethodArgumentNotValidException exception) {
     BindingResult bindingResult = exception.getBindingResult();
     StringBuilder exceptionMessageBuilder = new StringBuilder();
