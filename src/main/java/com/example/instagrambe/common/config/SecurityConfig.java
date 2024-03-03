@@ -65,8 +65,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorizeHttpRequests ->
             authorizeHttpRequests
                 .requestMatchers(new MvcRequestMatcher(introspector, "/")).permitAll()
-                .requestMatchers(new MvcRequestMatcher(introspector, "/api/login")).permitAll()
-                .requestMatchers(new MvcRequestMatcher(introspector, "/api/join")).permitAll()
+                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/login")).permitAll()
+                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/join")).permitAll()
                 .anyRequest().authenticated()
         )
         .exceptionHandling((exception) -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
