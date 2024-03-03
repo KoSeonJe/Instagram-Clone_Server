@@ -51,14 +51,14 @@ public class JwtService {
   public void sendAccessTokenAndRefreshToken(String accessToken, String refreshToken,
       HttpServletResponse response) {
     response.setStatus(HttpServletResponse.SC_OK);
-    response.setHeader(jwtProperties.accessHeader, accessToken);
-    response.setHeader(jwtProperties.refreshHeader, refreshToken);
+    response.setHeader(jwtProperties.getAccessHeader(), accessToken);
+    response.setHeader(jwtProperties.getRefreshHeader(), refreshToken);
     log.info("엑세스 토큰, 리프레쉬 토큰 응답 헤더 전달 완료");
   }
 
   public boolean isValidAccessToken(String accessToken) {
     try {
-      JWT.require(Algorithm.HMAC512(jwtProperties.secretKey)).build().verify(accessToken);
+      JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build().verify(accessToken);
       if(!isLogoutToken(accessToken)){
         return true;
       }
@@ -71,7 +71,7 @@ public class JwtService {
 
   public boolean isValidRefreshToken(String refreshToken) {
     try {
-      JWT.require(Algorithm.HMAC512(jwtProperties.secretKey)).build().verify(refreshToken);
+      JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build().verify(refreshToken);
       if(existTokenByEmailInRedis(refreshToken)){
         return true;
       }
@@ -79,7 +79,6 @@ public class JwtService {
     } catch (JWTVerificationException e) {
       log.warn("[Warn] 유효하지 않은 토큰입니다. {}", e.getMessage());
       return false;
-//      throw new JwtValidationException("유효하지 않은 토큰");
     }
   }
 

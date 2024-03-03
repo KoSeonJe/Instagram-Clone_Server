@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     try {
-      Optional<String> refreshToken = jwtService.extractToken(request.getHeader(jwtProperties.refreshHeader))
+      Optional<String> refreshToken = jwtService.extractToken(request.getHeader(jwtProperties.getRefreshHeader()))
           .filter(jwtService::isValidRefreshToken);
 
       if (refreshToken.isPresent()) {
@@ -56,15 +56,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return;
       }
 
-      Optional<String> accessToken = jwtService.extractToken(request.getHeader(jwtProperties.accessHeader))
+      Optional<String> accessToken = jwtService.extractToken(request.getHeader(jwtProperties.getAccessHeader()))
           .filter(jwtService::isValidAccessToken);
-
-      if (accessToken.isPresent()) {
-        authenticate(accessToken.get());
-        filterChain.doFilter(request, response);
-        return;
-      }
-      throw new JwtValidationException("엑세스 토큰과 리프레시 토큰 모두 유효하지 않습니다!");
+      accessToken.ifPresent(this::authenticate);
+      doFilter(request, response, filterChain);
     } catch (JwtValidationException | IllegalArgumentException | AuthenticationException exception) {
       request.setAttribute("exception", exception);
     }

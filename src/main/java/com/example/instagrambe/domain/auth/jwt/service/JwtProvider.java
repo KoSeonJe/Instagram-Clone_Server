@@ -22,13 +22,13 @@ public class JwtProvider {
 
   public Optional<String> extractToken(String requestTokenHeader) {
     return Optional.ofNullable(requestTokenHeader)
-        .filter(header -> header.startsWith(JwtProperties.BEARER))
-        .map(header -> header.replace(JwtProperties.BEARER, JwtProperties.REPLACEMENT));
+        .filter(header -> header.startsWith(JwtProperties.TOKEN_TYPE))
+        .map(header -> header.replace(JwtProperties.TOKEN_TYPE, JwtProperties.REPLACEMENT));
   }
 
   public Optional<String> extractEmail(String token) {
     try {
-      return Optional.ofNullable(JWT.require(Algorithm.HMAC512(jwtProperties.secretKey))
+      return Optional.ofNullable(JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey()))
           .build()
           .verify(token)
           .getClaim(JwtProperties.EMAIL_CLAIM)
@@ -42,18 +42,18 @@ public class JwtProvider {
   public String createAccessToken(String username, Date now) {
     return JWT.create() // JWT 토큰을 생성하는 빌더 반환
         .withSubject(JwtProperties.ACCESS_TOKEN_SUBJECT) // JWT의 Subject 지정 -> AccessToken이므로 AccessToken
-        .withExpiresAt(new Date(now.getTime() + jwtProperties.accessTokenExpirationPeriod)) // 토큰 만료 시간 설정
+        .withExpiresAt(new Date(now.getTime() + jwtProperties.getAccessTokenExpirationPeriod())) // 토큰 만료 시간 설정
         .withClaim(JwtProperties.EMAIL_CLAIM, username)  // 클레임으로는 email 하나만 사용
-        .sign(Algorithm.HMAC512(jwtProperties.secretKey)); // HMAC512 알고리즘 사용, application-jwt.yml에서 지정한 secret 키로 암호화
+        .sign(Algorithm.HMAC512(jwtProperties.getSecretKey())); // HMAC512 알고리즘 사용, application-jwt.yml에서 지정한 secret 키로 암호화
   }
 
   public String createRefreshToken(String username, Date now) {
     String refreshToken = JWT.create()
         .withSubject(JwtProperties.REFRESH_TOKEN_SUBJECT)
-        .withExpiresAt(new Date(now.getTime() + jwtProperties.refreshTokenExpirationPeriod))
+        .withExpiresAt(new Date(now.getTime() + jwtProperties.getRefreshTokenExpirationPeriod()))
         .withClaim(JwtProperties.EMAIL_CLAIM, username) //리프레시 토큰에 사용자 정보를 저장하는게 맞는가? 고민
-        .sign(Algorithm.HMAC512(jwtProperties.secretKey));
-    tokenRepository.save(username, refreshToken, jwtProperties.refreshTokenExpirationPeriod);
+        .sign(Algorithm.HMAC512(jwtProperties.getSecretKey()));
+    tokenRepository.save(username, refreshToken, jwtProperties.getRefreshTokenExpirationPeriod());
     return refreshToken;
   }
 }
