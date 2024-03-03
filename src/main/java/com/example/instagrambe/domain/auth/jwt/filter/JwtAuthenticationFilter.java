@@ -27,8 +27,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private static final String NO_CHECK_LOGIN_URL = "/api/login";
-  private static final String NO_CHECK_JOIN_URL = "/api/join";
+  private static final String NO_CHECK_LOGIN_URL = "/api/auth/login";
+  private static final String NO_CHECK_JOIN_URL = "/api/auth/join";
 
   private final JwtService jwtService;
   private final MemberService memberService;

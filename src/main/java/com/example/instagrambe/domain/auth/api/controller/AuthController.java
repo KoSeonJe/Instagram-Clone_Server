@@ -3,6 +3,7 @@ package com.example.instagrambe.domain.auth.api.controller;
 import com.example.instagrambe.common.support.response.ApiResponse;
 import com.example.instagrambe.domain.auth.api.controller.dto.request.AuthCodeRequestDto;
 import com.example.instagrambe.domain.auth.api.controller.dto.request.JoinRequestDto;
+import com.example.instagrambe.domain.auth.api.controller.dto.request.VerifyCodeRequestDto;
 import com.example.instagrambe.domain.auth.api.controller.dto.response.MemberResponseDto;
 import com.example.instagrambe.domain.auth.api.service.AuthService;
 import com.example.instagrambe.domain.auth.api.service.dto.response.MemberResponseServiceDto;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -34,7 +35,7 @@ public class AuthController {
         HttpStatus.OK);
   }
 
-  @PostMapping("/code")
+  @PostMapping("/send-code")
   public ResponseEntity<ApiResponse<Object>> sendCode(@RequestBody @Valid AuthCodeRequestDto authCodeRequestDto) {
     authService.sendCode(authCodeRequestDto.getEmail());
     return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
@@ -42,7 +43,7 @@ public class AuthController {
 
   @PostMapping("/logout")
   public ResponseEntity<ApiResponse<Object>> logout(HttpServletRequest request) {
-    authService.logout(request.getHeader(jwtProperties.accessHeader), new Date());
+    authService.logout(request.getHeader(jwtProperties.getAccessHeader()), new Date());
     return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
   }
 }
