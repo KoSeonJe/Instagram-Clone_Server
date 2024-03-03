@@ -2,6 +2,7 @@ package com.example.instagrambe.domain.auth.api.service;
 
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import com.example.instagrambe.domain.auth.api.service.dto.request.JoinRequestServiceDto;
+import com.example.instagrambe.domain.auth.api.service.dto.request.VerifyCodeServiceDto;
 import com.example.instagrambe.domain.auth.api.service.dto.response.MemberResponseServiceDto;
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
 import com.example.instagrambe.domain.member.entity.Member;
@@ -35,6 +36,10 @@ public class AuthService {
 
   public void sendCode(String email) {
     mailService.sendCodeToEmail(email);
+  }
+
+  public void verifyCode(VerifyCodeServiceDto verifyCodeServiceDto) {
+    mailService.verify(verifyCodeServiceDto.getEmail(), verifyCodeServiceDto.getVerifyCode());
   }
 
   public void logout(String accessHeader, Date now) {

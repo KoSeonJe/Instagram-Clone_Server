@@ -41,6 +41,13 @@ public class AuthController {
     return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
   }
 
+  @PostMapping("/verify-code")
+  public ResponseEntity<ApiResponse<Object>> verifyCode(
+      @RequestBody VerifyCodeRequestDto verifyCodeRequestDto) {
+    authService.verifyCode(verifyCodeRequestDto.toServiceDto());
+    return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
+  }
+
   @PostMapping("/logout")
   public ResponseEntity<ApiResponse<Object>> logout(HttpServletRequest request) {
     authService.logout(request.getHeader(jwtProperties.getAccessHeader()), new Date());
