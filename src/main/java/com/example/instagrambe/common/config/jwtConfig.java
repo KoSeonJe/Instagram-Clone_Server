@@ -2,6 +2,7 @@ package com.example.instagrambe.common.config;
 
 import com.example.instagrambe.domain.auth.jwt.constant.JwtProperties;
 import com.example.instagrambe.domain.auth.jwt.filter.JwtAuthenticationFilter;
+import com.example.instagrambe.domain.auth.jwt.filter.JwtExceptionFilter;
 import com.example.instagrambe.domain.auth.jwt.repository.TokenRepository;
 import com.example.instagrambe.domain.auth.jwt.service.JwtProvider;
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
@@ -21,6 +22,11 @@ public class jwtConfig {
   @Bean
   public JwtAuthenticationFilter jwtAuthenticationProcessingFilter() {
     return new JwtAuthenticationFilter(jwtService(), memberService, jwtProperties);
+  }
+
+  @Bean
+  public JwtExceptionFilter jwtExceptionFilter() {
+    return new JwtExceptionFilter();
   }
 
   @Bean
