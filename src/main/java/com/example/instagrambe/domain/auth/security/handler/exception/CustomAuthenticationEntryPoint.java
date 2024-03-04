@@ -1,6 +1,5 @@
 package com.example.instagrambe.domain.auth.security.handler.exception;
 
-import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,18 +22,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException e) throws IOException, ServletException {
-    if(request.getAttribute("exception") instanceof AuthenticationException){
       resolver.resolveException(request, response, null, e);
-      return;
-    }
-
-    if(request.getAttribute("exception") instanceof JwtValidationException){
-      resolver.resolveException(request, response, null, (JwtValidationException) request.getAttribute("exception"));
-      return;
-    }
-
-    if(request.getAttribute("exception") instanceof IllegalArgumentException){
-      resolver.resolveException(request, response, null, (IllegalArgumentException) request.getAttribute("exception"));
-    }
   }
 }
