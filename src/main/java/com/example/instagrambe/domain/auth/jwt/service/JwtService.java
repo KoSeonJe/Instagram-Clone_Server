@@ -3,7 +3,7 @@ package com.example.instagrambe.domain.auth.jwt.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.example.instagrambe.common.exception.custom.JwtValidationException;
+import com.example.instagrambe.common.exception.custom.JwtExpiredException;
 import com.example.instagrambe.domain.auth.jwt.constant.JwtProperties;
 import com.example.instagrambe.domain.auth.jwt.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +22,7 @@ public class JwtService {
   private final TokenRepository tokenRepository;
   private final JwtProvider jwtProvider;
   private final JwtProperties jwtProperties;
+
   public Optional<String> extractEmail(String token) {
     return jwtProvider.extractEmail(token);
   }
@@ -38,7 +39,7 @@ public class JwtService {
     return jwtProvider.createRefreshToken(username, now);
   }
 
-  public void expireOriginRefreshToken(String email){
+  public void expireOriginRefreshToken(String email) {
     tokenRepository.delete(email);
   }
 
@@ -58,21 +59,27 @@ public class JwtService {
 
   public boolean isValidAccessToken(String accessToken) {
     try {
-      JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build().verify(accessToken);
-      if(!isLogoutToken(accessToken)){
+      Date expiresAt = JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build()
+          .verify(accessToken)
+          .getExpiresAt();
+      validateExpiration(expiresAt);
+      if (!isLogoutToken(accessToken)) {
         return true;
       }
       throw new JWTVerificationException("로그아웃 된 토큰입니다.");
     } catch (JWTVerificationException e) {
       log.warn("[Warn] 유효하지 않은 토큰입니다. {}", e.getMessage());
-      throw new JwtValidationException("해당 엑세스 토큰은 유효하지 않습니다.");
+      return false;
     }
   }
 
   public boolean isValidRefreshToken(String refreshToken) {
     try {
-      JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build().verify(refreshToken);
-      if(existTokenByEmailInRedis(refreshToken)){
+      Date expiresAt = JWT.require(Algorithm.HMAC512(jwtProperties.getSecretKey())).build()
+          .verify(refreshToken)
+          .getExpiresAt();
+      validateExpiration(expiresAt);
+      if (existTokenByEmailInRedis(refreshToken)) {
         return true;
       }
       throw new JWTVerificationException("Redis에 저장되지 않은 토큰입니다");
@@ -82,14 +89,21 @@ public class JwtService {
     }
   }
 
+  private void validateExpiration(Date expiresAt) {
+    if(expiresAt.before(new Date())) {
+      throw new JwtExpiredException("토큰이 만료되었습니다.");
+    }
+  }
+
   private boolean existTokenByEmailInRedis(String refreshToken) {
-    String emailByTokenClaim = extractEmail(refreshToken)
-        .orElseThrow(() -> new JWTVerificationException("해당 토큰으로 이메일을 추출할 수 없습니다."));
-    return Objects.equals(refreshToken, tokenRepository.findValueByKey(emailByTokenClaim));
+    Optional<String> emailByToken = extractEmail(refreshToken);
+    return emailByToken.filter(s -> Objects.equals(refreshToken, tokenRepository.findValueByKey(s)))
+        .isPresent();
   }
 
   private boolean isLogoutToken(String token) {
-    Optional<String> values = tokenRepository.findValueByKey(token);
-    return values.filter(value -> Objects.equals(JwtProperties.BLACK_LIST, value)).isPresent();
+    Optional<String> accessTokenValue = tokenRepository.findValueByKey(token);
+    return accessTokenValue.filter(value -> Objects.equals(JwtProperties.BLACK_LIST, value))
+        .isPresent();
   }
 }
