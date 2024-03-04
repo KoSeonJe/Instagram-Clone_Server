@@ -13,6 +13,8 @@ public class JwtProperties {
   public final String secretKey;
   public final Long accessTokenExpirationPeriod;
   public final Long refreshTokenExpirationPeriod;
+  public static final String NO_CHECK_URL_STARTER = "/api/auth";
+  public static final String LOGOUT_URI = "/api/auth/logout";
   public static final String BLACK_LIST = "logout";
   public static final String REPLACEMENT = "";
   public static final String TOKEN_TYPE = "Bearer ";

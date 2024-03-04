@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,9 +25,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-  private static final String NO_CHECK_LOGIN_URL = "/api/auth/login";
-  private static final String NO_CHECK_JOIN_URL = "/api/auth/join";
 
   private final JwtService jwtService;
   private final MemberService memberService;
@@ -39,33 +35,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-
-    if (request.getRequestURI().equals(NO_CHECK_LOGIN_URL) || request.getRequestURI().equals(NO_CHECK_JOIN_URL)) {
+    String requestURI = request.getRequestURI();
+    if (requestURI.contains(JwtProperties.NO_CHECK_URL_STARTER) && !requestURI.equals(JwtProperties.LOGOUT_URI)) {
       doFilter(request, response, filterChain);
       return;
     }
 
-    try {
       Optional<String> refreshToken = jwtService.extractToken(request.getHeader(jwtProperties.getRefreshHeader()))
           .filter(jwtService::isValidRefreshToken);
 
       if (refreshToken.isPresent()) {
-        String email = extractEmail(refreshToken.get());
-        reIssueAccessTokenAndRefreshToken(response, email);
+        reIssueAccessTokenAndRefreshToken(response, refreshToken.get());
         log.info("리프레쉬 토큰, 엑세스 헤더 반환 완료");
         return;
       }
 
       Optional<String> accessToken = jwtService.extractToken(request.getHeader(jwtProperties.getAccessHeader()))
           .filter(jwtService::isValidAccessToken);
-      accessToken.ifPresent(this::authenticate);
-      doFilter(request, response, filterChain);
-    } catch (JwtValidationException | IllegalArgumentException | AuthenticationException exception) {
-      request.setAttribute("exception", exception);
-    }
+      if(accessToken.isPresent()){
+        accessToken.ifPresent(this::authenticate);
+        doFilter(request, response, filterChain);
+      }
+      throw new JwtValidationException("AccessToken과 RefreshToken이 둘다 유효하지 않습니다.");
   }
 
-  private void authenticate(String accessToken) throws JwtValidationException {
+  private void authenticate(String accessToken) {
     String email = extractEmail(accessToken);
     saveAuthentication(memberService.findMemberByEmail(email));
     log.info("authentication 객체 생성 및 저장 완료");
@@ -81,7 +75,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
-  private void reIssueAccessTokenAndRefreshToken(HttpServletResponse response, String email) {
+  private void reIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
+    String email = extractEmail(refreshToken);
     String accessToken = jwtService.createAccessToken(email, new Date());
     jwtService.expireOriginRefreshToken(email);
     String reIssuedRefreshToken = jwtService.createRefreshToken(email, new Date());
