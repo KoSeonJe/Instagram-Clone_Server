@@ -4,8 +4,8 @@ import com.example.instagrambe.domain.auth.jwt.filter.JwtAuthenticationFilter;
 import com.example.instagrambe.domain.auth.jwt.filter.JwtExceptionFilter;
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
 import com.example.instagrambe.domain.auth.security.filter.CustomJsonUsernamePasswordFilter;
-import com.example.instagrambe.domain.auth.security.handler.LoginFailureHandler;
-import com.example.instagrambe.domain.auth.security.handler.LoginSuccessHandler;
+import com.example.instagrambe.domain.auth.security.handler.login.LoginFailureHandler;
+import com.example.instagrambe.domain.auth.security.handler.login.LoginSuccessHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -97,12 +97,12 @@ public class SecurityConfig {
 
   @Bean
   public LoginSuccessHandler loginSuccessHandler() {
-    return new LoginSuccessHandler(jwtService);
+    return new LoginSuccessHandler(jwtService, objectMapper);
   }
 
   @Bean
   public LoginFailureHandler loginFailureHandler() {
-    return new LoginFailureHandler();
+    return new LoginFailureHandler(objectMapper);
   }
 
   @Bean
