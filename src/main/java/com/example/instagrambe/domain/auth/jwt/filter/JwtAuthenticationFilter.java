@@ -5,13 +5,11 @@ import com.example.instagrambe.domain.auth.jwt.constant.JwtProperties;
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
 import com.example.instagrambe.domain.auth.security.CustomUserDetails;
 import com.example.instagrambe.domain.member.entity.Member;
-import com.example.instagrambe.domain.member.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +25,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
-  private final MemberService memberService;
   private final JwtProperties jwtProperties;
 
   private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
@@ -35,35 +32,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String requestURI = request.getRequestURI();
-    if (requestURI.contains(JwtProperties.NO_CHECK_URL_STARTER) && !requestURI.equals(JwtProperties.LOGOUT_URI)) {
+
+    if (isNoCheckURI(request.getRequestURI())) {
       filterChain.doFilter(request, response);
       return;
     }
 
-      Optional<String> refreshToken = jwtService.extractToken(request.getHeader(jwtProperties.getRefreshHeader()))
-          .filter(jwtService::isValidRefreshToken);
-
+      Optional<String> refreshToken = extractRefreshToken(request);
       if (refreshToken.isPresent()) {
         reIssueAccessTokenAndRefreshToken(response, refreshToken.get());
         log.info("리프레쉬 토큰, 엑세스 헤더 반환 완료");
         return;
       }
 
-      Optional<String> accessToken = jwtService.extractToken(request.getHeader(jwtProperties.getAccessHeader()))
-          .filter(jwtService::isValidAccessToken);
+      Optional<String> accessToken = extractAccessToken(request);
       if(accessToken.isPresent()){
-        accessToken.ifPresent(this::authenticate);
+        Member member = findMemberByAccessToken(accessToken.get());
+        saveAuthentication(member);
+        log.info("엑세스 토큰으로 유저 정보 추출 후 authentication 객체 저장 완료");
         filterChain.doFilter(request, response);
         return;
       }
       throw new JwtValidationException("AccessToken과 RefreshToken이 둘다 유효하지 않습니다.");
   }
 
-  private void authenticate(String accessToken) {
-    String email = extractEmail(accessToken);
-    saveAuthentication(memberService.findMemberByEmail(email));
-    log.info("authentication 객체 생성 및 저장 완료");
+  private boolean isNoCheckURI(String requestURI) {
+    return requestURI.contains(JwtProperties.NO_CHECK_URL_STARTER) && !requestURI.equals(JwtProperties.LOGOUT_URI);
+  }
+
+  private Optional<String> extractRefreshToken(HttpServletRequest request) {
+    return jwtService.extractToken(request.getHeader(jwtProperties.getRefreshHeader()))
+        .filter(jwtService::isValidRefreshToken);
+  }
+
+  private void reIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
+    jwtService.reIssueAccessTokenAndRefreshToken(response, refreshToken);
+  }
+
+  private Optional<String> extractAccessToken(HttpServletRequest request) {
+    return jwtService.extractToken(request.getHeader(jwtProperties.getAccessHeader()))
+        .filter(jwtService::isValidAccessToken);
+  }
+
+  private Member findMemberByAccessToken(String accessToken) {
+    return jwtService.findMemberByAccessToken(accessToken);
   }
 
   private void saveAuthentication(Member member) {
@@ -74,18 +86,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authoritiesMapper.mapAuthorities(customUserDetails.getAuthorities()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
-  }
-
-  private void reIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
-    String email = extractEmail(refreshToken);
-    String accessToken = jwtService.createAccessToken(email, new Date());
-    jwtService.expireOriginRefreshToken(email);
-    String reIssuedRefreshToken = jwtService.createRefreshToken(email, new Date());
-    jwtService.sendAccessTokenAndRefreshToken(accessToken, reIssuedRefreshToken, response);
-  }
-
-  private String extractEmail(String token) {
-    return jwtService.extractEmail(token)
-        .orElseThrow(() -> new JwtValidationException("토큰으로 이메일을 찾을 수 없습니다."));
   }
 }
