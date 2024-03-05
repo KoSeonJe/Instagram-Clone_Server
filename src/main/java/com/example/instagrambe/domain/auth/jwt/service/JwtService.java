@@ -4,8 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.instagrambe.common.exception.custom.JwtExpiredException;
+import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import com.example.instagrambe.domain.auth.jwt.constant.JwtProperties;
 import com.example.instagrambe.domain.auth.jwt.repository.TokenRepository;
+import com.example.instagrambe.domain.member.entity.Member;
+import com.example.instagrambe.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Objects;
@@ -19,12 +22,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JwtService {
 
-  private final TokenRepository tokenRepository;
+  private final MemberService memberService;
   private final JwtProvider jwtProvider;
   private final JwtProperties jwtProperties;
+  private final TokenRepository tokenRepository;
 
-  public Optional<String> extractEmail(String token) {
-    return jwtProvider.extractEmail(token);
+  public String extractEmail(String token) {
+    return jwtProvider.extractEmail(token)
+        .orElseThrow(() -> new JwtValidationException("해당 토큰으로 이메일을 찾을 수 없습니다."));
   }
 
   public Optional<String> extractToken(String requestTokenHeader) {
@@ -89,6 +94,19 @@ public class JwtService {
     }
   }
 
+  public Member findMemberByAccessToken(String accessToken) {
+    String email = extractEmail(accessToken);
+    return memberService.findMemberByEmail(email);
+  }
+
+  public void reIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
+    String email = extractEmail(refreshToken);
+    String accessToken = createAccessToken(email, new Date());
+    expireOriginRefreshToken(email);
+    String reIssuedRefreshToken = createRefreshToken(email, new Date());
+    sendAccessTokenAndRefreshToken(accessToken, reIssuedRefreshToken, response);
+  }
+
   private void validateExpiration(Date expiresAt) {
     if(expiresAt.before(new Date())) {
       throw new JwtExpiredException("토큰이 만료되었습니다.");
@@ -96,13 +114,14 @@ public class JwtService {
   }
 
   private boolean existTokenByEmailInRedis(String refreshToken) {
-    Optional<String> emailByToken = extractEmail(refreshToken);
-    return emailByToken.filter(s -> Objects.equals(refreshToken, tokenRepository.findValueByKey(s)))
+    String emailByToken = extractEmail(refreshToken);
+    Optional<String> extractedTokenInRedis = tokenRepository.findValueByKey(emailByToken);
+    return extractedTokenInRedis.filter(value -> Objects.equals(refreshToken, value))
         .isPresent();
   }
 
-  private boolean isLogoutToken(String token) {
-    Optional<String> accessTokenValue = tokenRepository.findValueByKey(token);
+  private boolean isLogoutToken(String accessToken) {
+    Optional<String> accessTokenValue = tokenRepository.findValueByKey(accessToken);
     return accessTokenValue.filter(value -> Objects.equals(JwtProperties.BLACK_LIST, value))
         .isPresent();
   }

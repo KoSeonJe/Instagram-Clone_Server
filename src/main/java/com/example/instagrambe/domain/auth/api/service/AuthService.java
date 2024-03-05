@@ -54,8 +54,7 @@ public class AuthService {
   public void logout(String accessHeader, Date now) {
     String accessToken = jwtService.extractToken(accessHeader)
         .orElseThrow(() -> new JwtValidationException("토큰을 추출하는데 실패하였습니다."));
-    String email = jwtService.extractEmail(accessToken)
-        .orElseThrow(() -> new JwtValidationException("해당 토큰으로 이메일을 찾을 수 없습니다."));
+    String email = jwtService.extractEmail(accessToken);
     jwtService.accessTokenToBlackList(accessToken, now);
     jwtService.expireOriginRefreshToken(email);
     log.info("엑세스토큰 블랙리스트 및 리프레시 토큰 레디스에서 삭제 완료");
