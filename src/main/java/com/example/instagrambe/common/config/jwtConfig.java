@@ -7,6 +7,7 @@ import com.example.instagrambe.domain.auth.jwt.repository.TokenRepository;
 import com.example.instagrambe.domain.auth.jwt.service.JwtProvider;
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
 import com.example.instagrambe.domain.member.service.MemberService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,8 @@ public class jwtConfig {
   private final TokenRepository tokenRepository;
   private final JwtProperties jwtProperties;
   private final MemberService memberService;
+  private final ObjectMapper objectMapper;
+
 
   @Bean
   public JwtAuthenticationFilter jwtAuthenticationProcessingFilter() {
@@ -26,7 +29,7 @@ public class jwtConfig {
 
   @Bean
   public JwtExceptionFilter jwtExceptionFilter() {
-    return new JwtExceptionFilter();
+    return new JwtExceptionFilter(objectMapper);
   }
 
   @Bean
