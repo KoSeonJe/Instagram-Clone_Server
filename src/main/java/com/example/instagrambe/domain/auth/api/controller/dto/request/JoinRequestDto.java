@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
 public class JoinRequestDto {
   @NotNull(message = "이메일을 입력해주세요")
   @Email(message = "이메일 형식으로 작성해주세요")

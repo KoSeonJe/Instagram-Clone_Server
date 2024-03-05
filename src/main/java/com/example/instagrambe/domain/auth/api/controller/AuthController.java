@@ -29,21 +29,22 @@ public class AuthController {
 
   @PostMapping("/join")
   public ResponseEntity<ApiResponse<MemberResponseDto>> join(
-      @RequestBody @Valid JoinRequestDto joinRequestDto) {
+      @Valid @RequestBody JoinRequestDto joinRequestDto) {
     MemberResponseServiceDto responseServiceDto = authService.join(joinRequestDto.toServiceDto());
     return new ResponseEntity<>(ApiResponse.success(MemberResponseDto.from(responseServiceDto)),
         HttpStatus.OK);
   }
 
   @PostMapping("/send-code")
-  public ResponseEntity<ApiResponse<Object>> sendCode(@RequestBody @Valid AuthCodeRequestDto authCodeRequestDto) {
+  public ResponseEntity<ApiResponse<Object>> sendCode(
+      @Valid @RequestBody AuthCodeRequestDto authCodeRequestDto) {
     authService.sendCode(authCodeRequestDto.getEmail());
     return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
   }
 
   @PostMapping("/verify-code")
   public ResponseEntity<ApiResponse<Object>> verifyCode(
-      @RequestBody VerifyCodeRequestDto verifyCodeRequestDto) {
+      @Valid @RequestBody VerifyCodeRequestDto verifyCodeRequestDto) {
     authService.verifyCode(verifyCodeRequestDto.toServiceDto());
     return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
   }
