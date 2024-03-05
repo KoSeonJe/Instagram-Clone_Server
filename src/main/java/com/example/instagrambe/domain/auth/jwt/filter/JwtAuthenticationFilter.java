@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
     String requestURI = request.getRequestURI();
     if (requestURI.contains(JwtProperties.NO_CHECK_URL_STARTER) && !requestURI.equals(JwtProperties.LOGOUT_URI)) {
-      doFilter(request, response, filterChain);
+      filterChain.doFilter(request, response);
       return;
     }
 
@@ -54,7 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           .filter(jwtService::isValidAccessToken);
       if(accessToken.isPresent()){
         accessToken.ifPresent(this::authenticate);
-        doFilter(request, response, filterChain);
+        filterChain.doFilter(request, response);
+        return;
       }
       throw new JwtValidationException("AccessToken과 RefreshToken이 둘다 유효하지 않습니다.");
   }
