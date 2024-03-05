@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class jwtConfig {
+public class JwtConfig {
 
   private final TokenRepository tokenRepository;
   private final JwtProperties jwtProperties;
