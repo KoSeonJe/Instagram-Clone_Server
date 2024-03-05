@@ -36,10 +36,10 @@ public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final JwtExceptionFilter jwtExceptionFilter;
-  private final ObjectMapper objectMapper;
   private final UserDetailsService customUserDetailsService;
   private final AuthenticationEntryPoint customAuthenticationEntryPoint;
   private final AccessDeniedHandler customAccessDeniedHandler;
+  private final ObjectMapper objectMapper;
   private final JwtService jwtService;
 
   @Bean

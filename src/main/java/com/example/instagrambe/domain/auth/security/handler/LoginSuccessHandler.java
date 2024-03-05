@@ -1,7 +1,6 @@
 package com.example.instagrambe.domain.auth.security.handler;
 
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,13 +17,13 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) throws IOException, ServletException {
+      Authentication authentication) throws IOException {
     String email = extractUserName(authentication);
     String accessToken = jwtService.createAccessToken(email, new Date());
     String refreshToken = jwtService.createRefreshToken(email, new Date());
 
     jwtService.sendAccessTokenAndRefreshToken(accessToken, refreshToken, response);
-    response.setContentType("text/plain; charset=UTF-8");
+    response.setContentType("text/plain;charset=UTF-8");
     response.getWriter().write("로그인 성공! 엑세스 토큰, 리프레시 토큰 발급 완료");
   }
 

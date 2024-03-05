@@ -1,6 +1,5 @@
 package com.example.instagrambe.domain.auth.security.handler;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,9 +12,8 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-      AuthenticationException exception) throws IOException, ServletException {
+      AuthenticationException exception) throws IOException {
     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-    response.setCharacterEncoding("UTF-8");
     response.setContentType("text/plain;charset=UTF-8");
     log.info("로그인에 실패했습니다. 메시지 : {}", exception.getMessage());
     response.getWriter().write("로그인 실패! 이메일이나 비밀번호를 확인해주세요.");
