@@ -1,6 +1,7 @@
 package com.example.instagrambe.common.config;
 
 import com.example.instagrambe.domain.auth.jwt.filter.JwtAuthenticationFilter;
+import com.example.instagrambe.domain.auth.jwt.filter.JwtExceptionFilter;
 import com.example.instagrambe.domain.auth.jwt.service.JwtService;
 import com.example.instagrambe.domain.auth.security.filter.CustomJsonUsernamePasswordFilter;
 import com.example.instagrambe.domain.auth.security.handler.LoginFailureHandler;
@@ -34,6 +35,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtExceptionFilter jwtExceptionFilter;
   private final ObjectMapper objectMapper;
   private final UserDetailsService customUserDetailsService;
   private final AuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -65,8 +67,10 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorizeHttpRequests ->
             authorizeHttpRequests
                 .requestMatchers(new MvcRequestMatcher(introspector, "/")).permitAll()
-                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/login")).permitAll()
-                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/join")).permitAll()
+                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/*")).permitAll()
+                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/*")).permitAll()
+                .requestMatchers(new MvcRequestMatcher(introspector, "/api/auth/logout"))
+                .authenticated()
                 .anyRequest().authenticated()
         )
         .exceptionHandling((exception) -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
@@ -74,8 +78,9 @@ public class SecurityConfig {
 
     //security와 jwt 토큰을 사용하기 때문에, jwt토큰 검증이 필요함.
     //토큰을 받아오고 토큰의 내용으로 인증하기 때문에, 토큰 검증 먼저 해야함.
-    http.addFilterAfter(customJsonUsernamePasswordFilter(), LogoutFilter.class);
-    http.addFilterBefore(jwtAuthenticationFilter, CustomJsonUsernamePasswordFilter.class);
+    http.addFilterAfter(customJsonUsernamePasswordFilter(), LogoutFilter.class)
+        .addFilterBefore(jwtAuthenticationFilter, CustomJsonUsernamePasswordFilter.class)
+        .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
 
     return http.build();
   }
