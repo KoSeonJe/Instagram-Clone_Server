@@ -10,17 +10,21 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@RequiredArgsConstructor
 public class JwtExceptionFilter extends OncePerRequestFilter {
 
   private static final String RESPONSE_CONTENT_TYPE = "application/json;charset=UTF-8";
+
+  private final ObjectMapper objectMapper;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     try {
-      doFilter(request, response, filterChain);
+      filterChain.doFilter(request, response);
     } catch (JwtValidationException e) {
       responseErrorMessage(request, response, ErrorType.JWT_VALID_EXCEPTION);
     } catch (IllegalArgumentException e) {
