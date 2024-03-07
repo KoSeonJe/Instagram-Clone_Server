@@ -1,10 +1,10 @@
 package com.example.instagrambe.common.config;
 
-import com.example.instagrambe.domain.auth.jwt.constant.JwtProperties;
-import com.example.instagrambe.domain.auth.jwt.filter.JwtAuthenticationFilter;
-import com.example.instagrambe.domain.auth.jwt.filter.JwtExceptionFilter;
-import com.example.instagrambe.domain.auth.jwt.repository.TokenRepository;
-import com.example.instagrambe.domain.auth.jwt.service.JwtService;
+import com.example.instagrambe.auth.jwt.constant.JwtProperties;
+import com.example.instagrambe.auth.jwt.filter.JwtAuthenticationFilter;
+import com.example.instagrambe.auth.jwt.filter.JwtExceptionFilter;
+import com.example.instagrambe.auth.jwt.repository.TokenRepository;
+import com.example.instagrambe.auth.jwt.service.JwtService;
 import com.example.instagrambe.domain.member.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

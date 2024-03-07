@@ -1,11 +1,11 @@
 package com.example.instagrambe.common.config;
 
-import com.example.instagrambe.domain.auth.jwt.filter.JwtAuthenticationFilter;
-import com.example.instagrambe.domain.auth.jwt.filter.JwtExceptionFilter;
-import com.example.instagrambe.domain.auth.jwt.service.JwtService;
-import com.example.instagrambe.domain.auth.security.filter.CustomJsonUsernamePasswordFilter;
-import com.example.instagrambe.domain.auth.security.handler.login.LoginFailureHandler;
-import com.example.instagrambe.domain.auth.security.handler.login.LoginSuccessHandler;
+import com.example.instagrambe.auth.jwt.filter.JwtAuthenticationFilter;
+import com.example.instagrambe.auth.jwt.filter.JwtExceptionFilter;
+import com.example.instagrambe.auth.jwt.service.JwtService;
+import com.example.instagrambe.auth.security.filter.CustomJsonUsernamePasswordFilter;
+import com.example.instagrambe.auth.security.handler.login.LoginFailureHandler;
+import com.example.instagrambe.auth.security.handler.login.LoginSuccessHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -36,11 +36,11 @@ public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final JwtExceptionFilter jwtExceptionFilter;
+  private final JwtService jwtService;
   private final UserDetailsService customUserDetailsService;
   private final AuthenticationEntryPoint customAuthenticationEntryPoint;
   private final AccessDeniedHandler customAccessDeniedHandler;
   private final ObjectMapper objectMapper;
-  private final JwtService jwtService;
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
@@ -73,7 +73,8 @@ public class SecurityConfig {
                 .authenticated()
                 .anyRequest().authenticated()
         )
-        .exceptionHandling((exception) -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
+        .exceptionHandling(
+            (exception) -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
         .exceptionHandling((exception) -> exception.accessDeniedHandler(customAccessDeniedHandler));
 
     //security와 jwt 토큰을 사용하기 때문에, jwt토큰 검증이 필요함.
