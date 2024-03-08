@@ -1,8 +1,8 @@
 package com.example.instagrambe.common.config;
 
-import com.example.instagrambe.auth.jwt.filter.JwtAuthenticationFilter;
-import com.example.instagrambe.auth.jwt.filter.JwtExceptionFilter;
-import com.example.instagrambe.auth.jwt.service.JwtService;
+import com.example.instagrambe.auth.security.jwt.filter.JwtAuthenticationFilter;
+import com.example.instagrambe.auth.security.jwt.filter.JwtExceptionFilter;
+import com.example.instagrambe.auth.security.jwt.service.JwtService;
 import com.example.instagrambe.auth.security.filter.CustomJsonUsernamePasswordFilter;
 import com.example.instagrambe.auth.security.handler.login.LoginFailureHandler;
 import com.example.instagrambe.auth.security.handler.login.LoginSuccessHandler;

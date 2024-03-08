@@ -1,4 +1,4 @@
-package com.example.instagrambe.auth.jwt.filter;
+package com.example.instagrambe.auth.security.jwt.filter;
 
 import com.example.instagrambe.common.exception.custom.JwtExpiredException;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;

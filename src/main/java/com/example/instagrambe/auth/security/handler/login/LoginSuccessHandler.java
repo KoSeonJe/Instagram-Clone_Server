@@ -1,6 +1,6 @@
 package com.example.instagrambe.auth.security.handler.login;
 
-import com.example.instagrambe.auth.jwt.service.JwtService;
+import com.example.instagrambe.auth.security.jwt.service.JwtService;
 import com.example.instagrambe.common.support.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.example.instagrambe.auth.jwt.repository;
+package com.example.instagrambe.auth.security.jwt.repository;
 
 import java.util.Optional;
 

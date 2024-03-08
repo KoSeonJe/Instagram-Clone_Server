@@ -1,9 +1,9 @@
-package com.example.instagrambe.auth.jwt.filter;
+package com.example.instagrambe.auth.security.jwt.filter;
 
-import com.example.instagrambe.auth.jwt.service.JwtService;
+import com.example.instagrambe.auth.security.jwt.service.JwtService;
 import com.example.instagrambe.auth.security.CustomUserDetails;
+import com.example.instagrambe.auth.security.jwt.constant.JwtProperties;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
-import com.example.instagrambe.auth.jwt.constant.JwtProperties;
 import com.example.instagrambe.domain.member.entity.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

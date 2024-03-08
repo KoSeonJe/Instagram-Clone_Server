@@ -7,7 +7,7 @@ import com.example.instagrambe.auth.api.service.dto.response.MemberResponseServi
 import com.example.instagrambe.common.support.response.ApiResponse;
 import com.example.instagrambe.auth.api.controller.dto.request.JoinRequestDto;
 import com.example.instagrambe.auth.api.service.AuthService;
-import com.example.instagrambe.auth.jwt.constant.JwtProperties;
+import com.example.instagrambe.auth.security.jwt.constant.JwtProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Date;

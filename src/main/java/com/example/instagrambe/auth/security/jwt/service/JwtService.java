@@ -1,12 +1,12 @@
-package com.example.instagrambe.auth.jwt.service;
+package com.example.instagrambe.auth.security.jwt.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.instagrambe.auth.security.jwt.constant.JwtProperties;
 import com.example.instagrambe.common.exception.custom.JwtExpiredException;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
-import com.example.instagrambe.auth.jwt.constant.JwtProperties;
-import com.example.instagrambe.auth.jwt.repository.TokenRepository;
+import com.example.instagrambe.auth.security.jwt.repository.TokenRepository;
 import com.example.instagrambe.domain.member.entity.Member;
 import com.example.instagrambe.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;

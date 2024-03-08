@@ -1,4 +1,4 @@
-package com.example.instagrambe.auth.jwt.repository;
+package com.example.instagrambe.auth.security.jwt.repository;
 
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import java.util.Optional;

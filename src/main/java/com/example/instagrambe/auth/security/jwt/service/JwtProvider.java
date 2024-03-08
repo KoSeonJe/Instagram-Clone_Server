@@ -1,10 +1,10 @@
-package com.example.instagrambe.auth.jwt.service;
+package com.example.instagrambe.auth.security.jwt.service;
 
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.instagrambe.auth.jwt.constant.JwtProperties;
-import com.example.instagrambe.auth.jwt.repository.TokenRepository;
+import com.example.instagrambe.auth.security.jwt.constant.JwtProperties;
+import com.example.instagrambe.auth.security.jwt.repository.TokenRepository;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import java.util.Date;
 import java.util.Optional;

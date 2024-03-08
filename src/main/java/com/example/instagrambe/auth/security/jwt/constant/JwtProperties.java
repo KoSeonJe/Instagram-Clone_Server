@@ -1,4 +1,4 @@
-package com.example.instagrambe.auth.jwt.constant;
+package com.example.instagrambe.auth.security.jwt.constant;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

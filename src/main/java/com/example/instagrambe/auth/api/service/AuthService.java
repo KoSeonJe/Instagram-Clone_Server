@@ -1,7 +1,7 @@
 package com.example.instagrambe.auth.api.service;
 
 import com.example.instagrambe.auth.api.service.dto.response.MemberResponseServiceDto;
-import com.example.instagrambe.auth.jwt.service.JwtService;
+import com.example.instagrambe.auth.security.jwt.service.JwtService;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
 import com.example.instagrambe.auth.api.repository.AuthCodeRepository;
 import com.example.instagrambe.auth.api.service.dto.request.JoinRequestServiceDto;
