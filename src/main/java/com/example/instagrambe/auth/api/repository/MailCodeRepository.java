@@ -19,7 +19,6 @@ public class MailCodeRepository implements AuthCodeRepository {
   public void save(String key, String value) {
     ValueOperations<String, String> redis = redisTemplate.opsForValue();
     redis.set(key, value, EXPIRATION, TimeUnit.MINUTES);
-
   }
 
   @Override
