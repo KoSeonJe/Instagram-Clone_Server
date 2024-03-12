@@ -27,7 +27,7 @@ public class MemberService {
   }
 
   public void validateDuplicatedEmail(String email) {
-    if(memberRepository.findByEmail(email).isPresent()){
+    if(memberRepository.existsByEmail(email)){
      throw new DuplicatedException("중복된 이메일 입니다.");
     }
   }
