@@ -1,4 +1,4 @@
-package com.example.instagrambe.auth.api.repository;
+package com.example.instagrambe.auth.mail;
 
 import com.example.instagrambe.config.TestContainerConfig;
 import java.util.concurrent.TimeUnit;
