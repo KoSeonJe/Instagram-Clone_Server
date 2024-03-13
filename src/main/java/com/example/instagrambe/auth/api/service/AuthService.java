@@ -1,13 +1,16 @@
 package com.example.instagrambe.auth.api.service;
 
 import com.example.instagrambe.auth.api.service.dto.response.MemberResponseServiceDto;
+import com.example.instagrambe.auth.mail.AuthCodeFactory;
+import com.example.instagrambe.auth.mail.MailService;
 import com.example.instagrambe.auth.security.jwt.service.JwtService;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
-import com.example.instagrambe.auth.api.repository.AuthCodeRepository;
+import com.example.instagrambe.auth.mail.AuthCodeRepository;
 import com.example.instagrambe.auth.api.service.dto.request.JoinRequestServiceDto;
 import com.example.instagrambe.auth.api.service.dto.request.VerifyCodeServiceDto;
 import com.example.instagrambe.domain.member.entity.Member;
 import com.example.instagrambe.domain.member.service.MemberService;
+import jakarta.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +47,10 @@ public class AuthService {
   }
 
   public void sendCode(String email) {
-    mailService.sendCodeToEmail(email);
+    String authCode = AuthCodeFactory.createKey();
+    MimeMessage mail = mailService.createMailContent(email, authCode);
+    mailService.sendMail(mail);
+    authCodeRepository.save(email, authCode);
   }
 
   public void verifyCode(VerifyCodeServiceDto verifyCodeServiceDto) {
