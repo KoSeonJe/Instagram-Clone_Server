@@ -40,7 +40,7 @@ public class MailConfig {
   @Value("${mail.properties.mail.smtp.write timeout}")
   private int writeTimeout;
 
-  private static final String CONTENT_TYPE = "UTF-8";
+  private static final String ENCODING_TYPE = "UTF-8";
 
   @Bean
   public JavaMailSender javaMailSender() {
@@ -49,7 +49,7 @@ public class MailConfig {
     mailSender.setPort(port);
     mailSender.setUsername(username);
     mailSender.setPassword(password);
-    mailSender.setDefaultEncoding(CONTENT_TYPE);
+    mailSender.setDefaultEncoding(ENCODING_TYPE);
     mailSender.setJavaMailProperties(getMailProperties());
 
     return mailSender;
