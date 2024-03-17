@@ -1,13 +1,12 @@
 package com.example.instagrambe.auth.api.service;
 
+import com.example.instagrambe.auth.api.service.dto.request.JoinRequestServiceDto;
+import com.example.instagrambe.auth.api.service.dto.request.VerifyCodeServiceDto;
 import com.example.instagrambe.auth.api.service.dto.response.MemberResponseServiceDto;
-import com.example.instagrambe.auth.mail.AuthCodeFactory;
+import com.example.instagrambe.auth.mail.AuthCodeRepository;
 import com.example.instagrambe.auth.mail.MailService;
 import com.example.instagrambe.auth.security.jwt.service.JwtService;
 import com.example.instagrambe.common.exception.custom.JwtValidationException;
-import com.example.instagrambe.auth.mail.AuthCodeRepository;
-import com.example.instagrambe.auth.api.service.dto.request.JoinRequestServiceDto;
-import com.example.instagrambe.auth.api.service.dto.request.VerifyCodeServiceDto;
 import com.example.instagrambe.domain.member.entity.Member;
 import com.example.instagrambe.domain.member.service.MemberService;
 import jakarta.mail.internet.MimeMessage;
@@ -15,7 +14,6 @@ import java.util.Date;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,26 +26,25 @@ public class AuthService {
 
   private final MemberService memberService;
   private final JwtService jwtService;
-  private final PasswordEncoder passwordEncoder;
   private final MailService mailService;
+  private final PasswordEncoder passwordEncoder;
   private final AuthCodeRepository authCodeRepository;
+  private final AuthValidator authValidator;
 
   private static final String SUCCESS_VERIFICATION = "SUCCESS";
 
 
   public MemberResponseServiceDto join(JoinRequestServiceDto requestServiceDto) {
     String email = requestServiceDto.getEmail();
-    memberService.validateDuplicatedEmail(requestServiceDto.getEmail());
-    validateEmailAuthSuccess(email);
-    String encodePassword = passwordEncoder.encode(requestServiceDto.getPassword());
+    authValidator.validateJoin(email);
+    String encodePassword = getEncodedPassword(requestServiceDto.getPassword());
     Member member = requestServiceDto.toEntity(encodePassword);
     memberService.save(member);
     log.info("회원가입 완료");
     return MemberResponseServiceDto.from(member);
   }
 
-  public void sendCode(String email) {
-    String authCode = AuthCodeFactory.createKey();
+  public void sendCode(String email, String authCode) {
     MimeMessage mail = mailService.createMailContent(email, authCode);
     mailService.sendMail(mail);
     authCodeRepository.save(email, authCode);
@@ -57,22 +54,17 @@ public class AuthService {
     verify(verifyCodeServiceDto.getEmail(), verifyCodeServiceDto.getVerifyCode());
   }
 
-  public void logout(String accessHeader, Date now) {
-    String accessToken = jwtService.extractToken(accessHeader)
+  public void logout(String accessToken, Date now) {
+    String extractAccessToken = jwtService.extractToken(accessToken)
         .orElseThrow(() -> new JwtValidationException("토큰을 추출하는데 실패하였습니다."));
-    String email = jwtService.extractEmail(accessToken);
-    jwtService.accessTokenToBlackList(accessToken, now);
+    String email = jwtService.extractEmail(extractAccessToken);
+    jwtService.accessTokenToBlackList(extractAccessToken, now);
     jwtService.expireOriginRefreshToken(email);
     log.info("엑세스토큰 블랙리스트 및 리프레시 토큰 레디스에서 삭제 완료");
   }
 
-  private void validateEmailAuthSuccess(String email) {
-    String authResult = authCodeRepository.findByKey(email)
-        .orElseThrow(() -> new AuthenticationServiceException("이메일 인증을 완료해주세요"));
-
-    if (!authResult.equals(SUCCESS_VERIFICATION)) {
-      throw new AuthenticationServiceException("이메일 인증을 완료해주세요");
-    }
+  private String getEncodedPassword(String password) {
+    return passwordEncoder.encode(password);
   }
 
   private void verify(String email, String verifyCode) {

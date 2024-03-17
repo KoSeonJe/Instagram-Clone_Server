@@ -4,6 +4,7 @@ import com.example.instagrambe.auth.api.controller.dto.request.AuthCodeRequestDt
 import com.example.instagrambe.auth.api.controller.dto.request.VerifyCodeRequestDto;
 import com.example.instagrambe.auth.api.controller.dto.response.MemberResponseDto;
 import com.example.instagrambe.auth.api.service.dto.response.MemberResponseServiceDto;
+import com.example.instagrambe.auth.mail.AuthCodeFactory;
 import com.example.instagrambe.common.support.response.ApiResponse;
 import com.example.instagrambe.auth.api.controller.dto.request.JoinRequestDto;
 import com.example.instagrambe.auth.api.service.AuthService;
@@ -38,7 +39,7 @@ public class AuthController {
   @PostMapping("/send-code")
   public ResponseEntity<ApiResponse<Object>> sendCode(
       @Valid @RequestBody AuthCodeRequestDto authCodeRequestDto) {
-    authService.sendCode(authCodeRequestDto.getEmail());
+    authService.sendCode(authCodeRequestDto.getEmail(), AuthCodeFactory.createKey());
     return new ResponseEntity<>(ApiResponse.success(), HttpStatus.OK);
   }
 
