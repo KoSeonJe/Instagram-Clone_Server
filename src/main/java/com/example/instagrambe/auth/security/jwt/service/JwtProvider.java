@@ -20,10 +20,10 @@ public class JwtProvider {
   private final JwtProperties jwtProperties;
   private final TokenRepository tokenRepository;
 
-  public Optional<String> extractToken(String requestTokenHeader) {
-    return Optional.ofNullable(requestTokenHeader)
-        .filter(header -> header.startsWith(JwtProperties.TOKEN_TYPE))
-        .map(header -> header.replace(JwtProperties.TOKEN_TYPE, JwtProperties.REPLACEMENT));
+  public Optional<String> extractToken(String requestToken) {
+    return Optional.ofNullable(requestToken)
+        .filter(token -> token.startsWith(JwtProperties.TOKEN_TYPE))
+        .map(token -> token.replace(JwtProperties.TOKEN_TYPE, JwtProperties.REPLACEMENT));
   }
 
   public Optional<String> extractEmail(String token) {

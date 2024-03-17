@@ -32,8 +32,8 @@ public class JwtService {
         .orElseThrow(() -> new JwtValidationException("해당 토큰으로 이메일을 찾을 수 없습니다."));
   }
 
-  public Optional<String> extractToken(String requestTokenHeader) {
-    return jwtProvider.extractToken(requestTokenHeader);
+  public Optional<String> extractToken(String requestToken) {
+    return jwtProvider.extractToken(requestToken);
   }
 
   public String createAccessToken(String username, Date now) {
