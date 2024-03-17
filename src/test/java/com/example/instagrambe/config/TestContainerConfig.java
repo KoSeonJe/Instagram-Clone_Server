@@ -9,15 +9,15 @@ public class TestContainerConfig implements BeforeAllCallback {
 
   private static final String REDIS_IMAGE = "redis:7.0.8-alpine";
   private static final int REDIS_PORT = 6379;
-  private GenericContainer redis;
+  private GenericContainer redisContainer;
 
   @Override
   public void beforeAll(ExtensionContext context) {
-    redis = new GenericContainer(DockerImageName.parse(REDIS_IMAGE))
+    redisContainer = new GenericContainer(DockerImageName.parse(REDIS_IMAGE))
         .withExposedPorts(REDIS_PORT);
-    redis.start();
-    System.setProperty("spring.data.redis.host", redis.getHost());
-    System.setProperty("spring.data.redis.port", String.valueOf(redis.getMappedPort(REDIS_PORT
+    redisContainer.start();
+    System.setProperty("spring.data.redis.host", redisContainer.getHost());
+    System.setProperty("spring.data.redis.port", String.valueOf(redisContainer.getMappedPort(REDIS_PORT
     )));
   }
 }
