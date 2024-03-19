@@ -1,4 +1,4 @@
-# Instagram-BE (기술 연습)
+# Login_Practice (기술 연습)
 
 ## 1. Auth
 
