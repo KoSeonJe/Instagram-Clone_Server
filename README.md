@@ -50,7 +50,11 @@
 ### 로그아웃
 
 1. 현재 AccessToken을 강제 만료시킬 수 없기 때문에, Redis를 이용하여 블랙리스트 처리 한다.
+
+---
+
+## 2. Concurrency
     - key - AccessToken
     - value - “logout”
     - Redis의 만료시간은 AccessToken의 남은 만료 시간으로 저장한다.
-2. Redis에 저장된 RefreshToken을 삭제한다.
+3. Redis에 저장된 RefreshToken을 삭제한다.
